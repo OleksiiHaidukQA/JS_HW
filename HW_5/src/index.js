@@ -1,10 +1,19 @@
-function doubleLetter(str) {
-    const splitedstr = str.split('');
-    let res = ''
-    for (const iterator of splitedstr) {
-        res = res + iterator + iterator;
-    }
-    console.log(res)
+//Перша умова//
+function reverseString(str) {
+ return str.split('').reverse().join('');
+    
 }
 
-doubleLetter('Hello, Valentyn')
+console.log(reverseString('Hello Valentyn')); 
+
+//Друга умова (паліндром)//
+function isPalindrome(str) {
+
+const cleanedStr = str.replace(/\s/g, '').toLowerCase();
+const reversedStr = cleanedStr.split('').reverse().join('');
+return cleanedStr === reversedStr;
+    
+}
+
+console.log(isPalindrome('вирив'));
+
