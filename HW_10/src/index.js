@@ -3,17 +3,51 @@
 До отриманого під час групування об'єктаnotifications, вам необхідно додати ітератор, щоб під час перебору в цикліfor ofми отримували кожен елемент із вкладених списків об'єктаnotificationsтаким чином, немов працюємо з "плоским" масивом.
 */
 function groupNotifications(notifications) {
-    const groupedNotifications = {};
-        for (const notification of notifications) {
-             const source = notification.source;
-             const text = notification.Text;
-             const date = notification.Date;
-        if (!groupedNotifications[source]) {
-             groupedNotifications[source] = [];
-        }                  
-             groupedNotifications[source].push({Text:text, Date:date});
+    const groupedNotifications = {
+        [Symbol.iterator]: function() {
+            const sources = Object.keys(groupedNotifications);
+            let sourceIndex = 0;
+            let notificationIndex = 0;
+
+            return {
+                next: function() {
+                    if (sourceIndex < sources.length) {
+                        const source = sources[sourceIndex];
+                        const notificationsForSource = groupedNotifications[source];
+
+                        if (notificationIndex < notificationsForSource.length) {
+                            const result = {
+                                value: notificationsForSource[notificationIndex],
+                                done: false
+                            };
+                            notificationIndex++;
+                            return result;
+                        } else {
+                            sourceIndex++;
+                            notificationIndex = 0;
+                            return this.next();
+                        }
+                    } else {
+                        return { done: true };
+                    }
+                }
+            };
         }
-        return groupedNotifications;
+    };
+
+    for (const notification of notifications) {
+        const source = notification.source;
+        const text = notification.Text;
+        const date = notification.Date;
+
+        if (!groupedNotifications[source]) {
+            groupedNotifications[source] = [];
+        }
+
+        groupedNotifications[source].push({ Text: text, Date: date });
+    }
+
+    return groupedNotifications;
 }
 
 const notifications = [
@@ -24,7 +58,9 @@ const notifications = [
 ];
 
 const grouped = groupNotifications(notifications);
-console.log(grouped);
+for (const notification of grouped) {
+    console.log(notification);
+}
 
 /* Умова №2
 Вам необхідно реалізувати функціюmemoize(fn), яка приймає вхід функцію і додає їй можливість кешування результатів виконання, щоб уникнути повторних обчислень.
